@@ -1,15 +1,15 @@
-id: winehub.test.shell
+id: online.winehub.test.shell32
 branch: stable
 
-runtime: winehub..Platform
+runtime: online.winehub.Platform
 runtime-version: 1.6
-sdk: winehub.Sdk
+sdk: online.winehub.Sdk
 
 add-extensions:
-  - winehub.Platform.Compat32
+  - online.winehub.Platform.Compat32
 
 modules:
-  # this must be done in application level
+  # this must be done on application level
   - name: setup-platform-compat32
     buildsystem: simple
     only-arches: x86_64
@@ -20,7 +20,8 @@ modules:
   - name: shell32
     buildsystem: simple
     build-commands:
-      - install -Dm755 shell.sh /app/bin/shell32.sh
+      - install -Dm755 shell32.sh /app/bin/shell32.sh
     sources:
       - type: file
         path: shell32.sh
+

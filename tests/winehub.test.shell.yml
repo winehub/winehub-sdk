@@ -1,12 +1,9 @@
-id: org.test.shell
+id: online.winehub.test.shell
 branch: stable
 
-runtime: org.test.Platform
+runtime: online.winehub.Platform
 runtime-version: 1.6
-sdk: org.test.Sdk
-
-add-extensions:
-  - org.test.Platform.Compat32
+sdk: online.winehub.Sdk
 
 modules:
   - name: shell
