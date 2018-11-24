@@ -31,7 +31,7 @@
     "cleanup-platform-commands": [ "/usr/libexec/freedesktop-post.sh" ],
     "modules": [
 	    {
-	    "name": "setup-platform-combat32",
+	    "name": "setup-platform-compat32",
 	    "only-arches" : [ "x86_64"],
 	    "buildsystem": "simple",
 	    "build-commands":[
