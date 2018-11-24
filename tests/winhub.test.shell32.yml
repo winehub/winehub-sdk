@@ -1,0 +1,26 @@
+id: winehub.test.shell
+branch: stable
+
+runtime: winehub..Platform
+runtime-version: 1.6
+sdk: winehub.Sdk
+
+add-extensions:
+  - winehub.Platform.Compat32
+
+modules:
+  # this must be done in application level
+  - name: setup-platform-compat32
+    buildsystem: simple
+    only-arches: x86_64
+    build-commands:
+      - mkdir -p /app/lib/
+      - ln -s /lib/32bit/lib/ld-linux.so.2 /app/lib/ld-linux.so.2
+  # fire 32bit shell in 64 bit
+  - name: shell32
+    buildsystem: simple
+    build-commands:
+      - install -Dm755 shell.sh /app/bin/shell32.sh
+    sources:
+      - type: file
+        path: shell32.sh

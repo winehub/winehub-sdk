@@ -1,0 +1,53 @@
+{
+    "build-runtime": true,
+    "id": "online.winehub.Sdk",
+    "id-platform": "online.winehub.Platform",
+    "branch": "1.6",
+    "runtime": "org.freedesktop.Platform",
+    "sdk": "org.freedesktop.Sdk",
+    "runtime-version": "1.6",
+    "inherit-extensions": [
+        "org.freedesktop.Platform.GL",
+        "org.freedesktop.Sdk.Extension",
+        "org.freedesktop.Platform.VAAPI.Intel",
+	"org.freedesktop.Platform.ffmpeg"
+    ],
+    "add-extensions": {
+	    "online.winehub.Platform.Compat32" : {
+		    "directory": "lib/32bit",
+		    "version": "1.6",
+		    "add-ld-path": "lib",
+		    "subdirectories": false,
+		    "autodelete": false,
+		    "no-autodownload": false
+	    }
+    },
+    "finish-args": [
+        "--sdk=online.winehub.Sdk//1.6",
+        "--runtime=online.winehub.Platform//1.6",
+	"--allow=multiarch"
+    ],
+    "cleanup-commands": [ "/usr/libexec/freedesktop-post.sh" ],
+    "cleanup-platform-commands": [ "/usr/libexec/freedesktop-post.sh" ],
+    "modules": [
+	    {
+	    "name": "setup-platform-x86_64",
+	    "only-arches" : [ "x86_64"],
+	    "buildsystem": "simple",
+	    "build-commands":[
+		    "mkdir /usr/lib/32bit"
+	    ]
+	    },
+	    {
+	    "name": "manifests",
+	    "buildsystem": "simple",
+	    "build-commands":[
+		    "mkdir -p /usr/share/appdata",
+		    "install online.winehub.Platform.manifest.xml /usr/share/appdata",
+		    "install online.winehub.Sdk.manifest.xml /usr/share/appdata",
+		    "appstream-compose --basename=online.winehub.Platform --prefix=/usr --origin=flatpak online.winehub.Platform",
+		    "appstream-compose --basename=online.winehub.Sdk --prefix=/usr --origin=flatpak online.winehub.Sdk"
+	    ]
+	    }
+    ]
+}

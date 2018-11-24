@@ -1,0 +1,18 @@
+id: org.test.shell
+branch: stable
+
+runtime: org.test.Platform
+runtime-version: 1.6
+sdk: org.test.Sdk
+
+add-extensions:
+  - org.test.Platform.Compat32
+
+modules:
+  - name: shell
+    buildsystem: simple
+    build-commands:
+      - install -Dm755 shell.sh /app/bin/shell.sh
+    sources:
+      - type: file
+        path: shell.sh

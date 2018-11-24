@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="runtime">
+    <id>online.winehub.Sdk</id>
+    <metadata_license>CC0</metadata_license>
+    <name>Winehub Software Development Kit</name>
+    <summary>Tools and headers the Winehub Platform (WineHQ)</summary>
+    <project_group>winehub</project_group>
+    <url type="homepage">https://www.winehub.online</url>
+</component>
