@@ -20,6 +20,30 @@
 		    "subdirectories": false,
 		    "autodelete": false,
 		    "no-autodownload": false
+	    },
+	    "online.winehub.Platform.Wine" : {
+		    "directory": "lib/wine",
+		    "version": "1.6",
+		    "add-ld-path": "lib",
+		    "subdirectories": false,
+		    "autodelete": false,
+		    "no-autodownload": false
+	    },
+	    "online.winehub.Platform.Extension" : {
+		    "directory": "lib/extension",
+		    "version": "1.6",
+		    "add-ld-path": "lib",
+		    "subdirectories": false,
+		    "autodelete": false,
+		    "no-autodownload": false
+	    },
+	    "online.winehub.Sdk.Extension" : {
+		    "directory": "lib/sdk",
+		    "version": "1.6",
+		    "add-ld-path": "lib",
+		    "subdirectories": false,
+		    "autodelete": false,
+		    "no-autodownload": false
 	    }
     },
     "finish-args": [
@@ -42,7 +66,7 @@
 	    "only-arches" : [ "x86_64"],
 	    "buildsystem": "simple",
 	    "build-commands":[
-		    "mkdir /usr/lib/32bit"
+		    "mkdir /usr/lib/32bit",
 		    "mkdir /usr/lib/32bit/wine"
 	    ]
 	    },
