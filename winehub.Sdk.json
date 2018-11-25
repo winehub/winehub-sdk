@@ -30,12 +30,20 @@
     "cleanup-commands": [ "/usr/libexec/freedesktop-post.sh" ],
     "cleanup-platform-commands": [ "/usr/libexec/freedesktop-post.sh" ],
     "modules": [
+            {
+            "name": "setup-platform",
+            "buildsystem": "simple",
+            "build-commands":[
+                    "mkdir /usr/lib/wine"
+            ]
+            },
 	    {
 	    "name": "setup-platform-compat32",
 	    "only-arches" : [ "x86_64"],
 	    "buildsystem": "simple",
 	    "build-commands":[
 		    "mkdir /usr/lib/32bit"
+		    "mkdir /usr/lib/32bit/wine"
 	    ]
 	    },
 	    {
