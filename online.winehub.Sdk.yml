@@ -1,0 +1,99 @@
+build-runtime: true
+
+id: online.winehub.Sdk
+id-platform: online.winehub.Platform
+branch: 1.6
+
+runtime: org.freedesktop.Platform
+runtime-version: 1.6
+sdk: org.freedesktop.Sdk
+
+add-extensions:
+  online.winehub.Platform.Compat32:
+    directory: lib/32bit
+    version: 1.6
+    versions: 1.6
+    add-ld-path: lib
+    subdirectories: false
+    autodelete: false
+    no-autodownload: false
+
+  online.winehub.Platform.Wine:
+    directory: lib/wine
+    version: 1.6
+    versions: 1.6
+    add-ld-path: lib
+    subdirectories: false
+    autodelete: false
+
+  online.winehub.Platform.Extension:
+    directory: lib/extension
+    version: 1.6
+    subdirectories: true
+    autodelete: true
+    no-autodownload: true
+
+  online.winehub.Sdk.Extension:
+    directory: lib/sdk
+    version: 1.6
+    subdirectories: true
+    autodelete: true
+    no-autodownload: true
+
+inherit-extensions:
+  - org.freedesktop.Platform.GL
+  - org.freedesktop.Platform.Timezones
+  - org.freedesktop.Platform.GStreamer
+  - org.freedesktop.Platform.VAAPI.Intel
+  - org.freedesktop.Sdk.Extension
+
+finish-args:
+  - --sdk=online.winehub.Sdk//1.6
+  - --runtime=online.winehub.Platform//1.6
+  - --allow=multiarch
+  - --env=WINEDEBUG=-all
+  - --env=WINEPREFIX=/var/data/wine
+
+cleanup:
+  - /man
+  - /share/man
+
+cleanup-commands:
+  - /usr/libexec/freedesktop-post.sh
+
+cleanup-platform-commands:
+  - /usr/libexec/freedesktop-post.sh
+
+modules:
+  - name: platform-setup
+    buildsystem: simple
+    build-commands:
+      - mkdir -p /usr/lib/extension
+      - mkdir -p /usr/lib/sdk
+      - mkdir -p /usr/lib/wine
+
+  - name: platform-setup-compat32
+    buildsystem: simple
+    build-commands:
+      - mkdir -p /usr/lib/32bit
+      - mkdir -p /usr/lib/32bit/extension
+      - mkdir -p /usr/lib/32bit/sdk
+      - mkdir -p /usr/lib/32bit/wine
+    only-arches: 
+      - x86_64
+
+  - name: metainfo
+    buildsystem: simple
+    build-commands:
+      - mkdir -p /usr/share/appdata
+      - install online.winehub.Platform.appdata.xml /usr/share/appdata
+      - install online.winehub.Sdk.appdata.xml /usr/share/appdata
+      - appstream-compose --basename=online.winehub.Platform --prefix=/usr --origin=flatpak online.winehub.Platform
+      - appstream-compose --basename=online.winehub.Sdk --prefix=/usr --origin=flatpak online.winehub.Sdk
+    sources:
+      - type: file
+        path: online.winehub.Sdk.appdata.xml
+      - type: file
+        path: online.winehub.Platform.appdata.xml
+
+
