@@ -9,94 +9,190 @@ runtime-version: 1.6
 sdk: org.freedesktop.Sdk
 
 add-extensions:
-  online.winehub.Platform.Compat32:
-    directory: lib/32bit
-    version: 1.6
-    versions: 1.6
-    add-ld-path: lib
-    subdirectories: false
-    autodelete: false
-    no-autodownload: false
+   online.winehub.Platform.Compat32:
+      directory: lib/32bit
+      version: 1.6
+      versions: 1.6
+      add-ld-path: lib
+      subdirectories: false
+      autodelete: false
+      no-autodownload: false
 
-  online.winehub.Platform.Wine:
-    directory: lib/wine
-    version: 1.6
-    versions: 1.6
-    add-ld-path: lib
-    subdirectories: false
-    autodelete: false
+   online.winehub.Platform.Wine:
+      directory: lib/wine
+      version: 1.6
+      versions: 1.6
+      add-ld-path: lib
+      subdirectories: false
+      autodelete: false
 
-  online.winehub.Platform.Extension:
-    directory: lib/extension
-    version: 1.6
-    subdirectories: true
-    autodelete: true
-    no-autodownload: true
+   online.winehub.Platform.Extension:
+      directory: lib/extension
+      version: 1.6
+      subdirectories: true
+      autodelete: true
+      no-autodownload: true
 
-  online.winehub.Sdk.Extension:
-    directory: lib/sdk
-    version: 1.6
-    subdirectories: true
-    autodelete: true
-    no-autodownload: true
+   online.winehub.Sdk.Extension:
+      directory: lib/sdk
+      version: 1.6
+      subdirectories: true
+      autodelete: true
+      no-autodownload: true
 
 platform-extensions:
-  - org.freedesktop.Platform.Locale
+   - org.freedesktop.Platform.Locale
 
 inherit-extensions:
-  - org.freedesktop.Platform.GL
-  - org.freedesktop.Platform.Timezones
-  - org.freedesktop.Platform.GStreamer
-  - org.freedesktop.Platform.VAAPI.Intel
-  - org.freedesktop.Sdk.Extension
+   - org.freedesktop.Platform.GL
+   - org.freedesktop.Platform.Timezones
+   - org.freedesktop.Platform.GStreamer
+   - org.freedesktop.Platform.VAAPI.Intel
+   - org.freedesktop.Sdk.Extension
 
 finish-args:
-  - --sdk=online.winehub.Sdk//1.6
-  - --runtime=online.winehub.Platform//1.6
-  - --allow=multiarch
-  - --env=WINEDEBUG=-all
-  - --env=WINEPREFIX=/var/data/wine
+   - --sdk=online.winehub.Sdk//1.6
+   - --runtime=online.winehub.Platform//1.6
+   - --allow=multiarch
+   - --env=WINEDEBUG=-all
+   - --env=WINEPREFIX=/var/data/wine
 
 cleanup:
-  - /man
-  - /share/man
+   - /man
+   - /share/man
 
 cleanup-commands:
-  - /usr/libexec/freedesktop-post.sh
+   - /usr/libexec/freedesktop-post.sh
 
 cleanup-platform-commands:
-  - /usr/libexec/freedesktop-post.sh
+   - /usr/libexec/freedesktop-post.sh
 
 modules:
-  - name: platform-setup
-    buildsystem: simple
-    build-commands:
-      - mkdir -p /usr/lib/extension
-      - mkdir -p /usr/lib/sdk
-      - mkdir -p /usr/lib/wine
+   - name: platform-setup
+     buildsystem: simple
+     build-commands:
+       - mkdir -p /usr/lib/extension
+       - mkdir -p /usr/lib/sdk
+       - mkdir -p /usr/lib/wine
 
-  - name: platform-setup-compat32
-    buildsystem: simple
-    build-commands:
-      - mkdir -p /usr/lib/32bit
-      - mkdir -p /usr/lib/32bit/extension
-      - mkdir -p /usr/lib/32bit/sdk
-      - mkdir -p /usr/lib/32bit/wine
-    only-arches: 
+   - name: platform-setup-compat32
+     buildsystem: simple
+     build-commands:
+        - mkdir -p /usr/lib/32bit
+        - mkdir -p /usr/lib/32bit/extension
+        - mkdir -p /usr/lib/32bit/sdk
+        - mkdir -p /usr/lib/32bit/wine
+     only-arches: 
       - x86_64
 
-  - name: metainfo
-    buildsystem: simple
-    build-commands:
-      - mkdir -p /usr/share/appdata
-      - install online.winehub.Platform.appdata.xml /usr/share/appdata
-      - install online.winehub.Sdk.appdata.xml /usr/share/appdata
-      - appstream-compose --basename=online.winehub.Platform --prefix=/usr --origin=flatpak online.winehub.Platform
-      - appstream-compose --basename=online.winehub.Sdk --prefix=/usr --origin=flatpak online.winehub.Sdk
-    sources:
-      - type: file
-        path: online.winehub.Sdk.appdata.xml
-      - type: file
-        path: online.winehub.Platform.appdata.xml
+   - name: llvm
+
+     buildsystem: "cmake-ninja"
+     builddir: true
+     cleanup-platform:
+        - "/bin/llvm-*"
+     build-options:
+       config-opts:
+         - -DLLVM_TARGETS_TO_BUILD=X86;AMDGPU;NVPTX;BPF
+         - -DBUILD_SHARED_LIBS:BOOL=ON
+         - -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON
+         - -DCMAKE_BUILD_TYPE=MinSizeRel
+         - -DLLVM_LIBDIR_SUFFIX=
+         - -DLLVM_ENABLE_LIBCXX:BOOL=OFF
+         - -DLLVM_ENABLE_ZLIB:BOOL=ON
+         - -DLLVM_ENABLE_FFI:BOOL=ON
+         - -DLLVM_ENABLE_RTTI:BOOL=ON
+         - -DLLVM_BUILD_RUNTIME:BOOL=ON
+         - -DLLVM_INCLUDE_TOOLS:BOOL=ON
+         - -DLLVM_BUILD_TOOLS:BOOL=ON
+         - -DLLVM_INCLUDE_TESTS:BOOL=OFF
+         - -DLLVM_BUILD_TESTS:BOOL=OFF
+         - -DLLVM_INCLUDE_EXAMPLES:BOOL=OFF
+         - -DLLVM_BUILD_EXAMPLES:BOOL=OFF
+         - -DLLVM_INCLUDE_UTILS:BOOL=ON
+         - -DLLVM_INSTALL_UTILS:BOOL=OFF
+         - -DLLVM_INCLUDE_DOCS:BOOL=OFF
+         - -DLLVM_BUILD_DOCS:BOOL=OFF
+         - -DLLVM_ENABLE_SPHINX:BOOL=OFF
+         - -DLLVM_ENABLE_DOXYGEN:BOOL=OFF
+         - -DLLVM_BUILD_LLVM_DYLIB:BOOL=OFF
+         - -DLLVM_BUILD_EXTERNAL_COMPILER_RT:BOOL=ON
+         - -DFFI_INCLUDE_DIR=/usr/lib/libffi-3.2.1/include
+         - -DLLVM_INSTALL_TOOLCHAIN_ONLY:BOOL=OFF
+     sources:
+        - type: "archiv"
+          url: "http://llvm.org/releases/4.0.1/llvm-4.0.1.src.tar.xz"
+          sha256: "da783db1f82d516791179fe103c71706046561f7972b18f0049242dee6712b51"
+
+   - name: mesa
+     build-options:
+        cxxflags: "-fno-rtti -fno-exceptions"
+        config-opts:
+           - --with-gallium-drivers=svga,swrast,radeonsi,nouveau,r600,r300,radeonsi,virgl
+           - --with-dri-drivers=swrast,nouveau,radeon,r200,i915,i965
+           - --with-vulkan-drivers=intel,radeon
+           - --enable-libglvnd
+           - --disable-selinux
+           - --disable-osmesa
+           - --with-dri-driverdir=/usr/lib/dri
+           - --enable-egl
+           - --disable-gles1
+           - --enable-gles2
+           - --enable-vdpau
+           - --enable-va
+           - --enable-xa
+           - --disable-xvmc
+           - --with-platforms=x11,drm,surfaceless,wayland
+           - --enable-shared-glapi
+           - --enable-gbm
+           - --disable-opencl
+           - --enable-glx-tls
+           - --enable-texture-float=yes
+           - --enable-dri
+           - --enable-llvm
+           - --with-llvm-prefix=/usr/lib/llvm6
+           - --disable-llvm-shared-lib
+
+     make-args:
+        - MKDEP=/bin/true
+
+     post-install:
+        - for i in /usr/lib/vdpau/*.so.1.0.0 /usr/lib/dri/*.so; do cp $i $i.tmp; eu-strip $i.tmp; mv $i.tmp $i; done
+        - ln -s libEGL_mesa.so /usr/lib/libEGL_indirect.so
+        - ln -s libEGL_mesa.so.0 /usr/lib/libEGL_indirect.so.0
+        - ln -s libGLX_mesa.so /usr/lib/libGLX_indirect.so
+        - ln -s libGLX_mesa.so.0 /usr/lib/libGLX_indirect.so.0
+
+     sources:
+        - type: "archiv"
+          url: "https://mesa.freedesktop.org/archive/mesa-18.1.8.tar.xz"
+          sha256: "bd1be67fe9c73b517765264ac28911c84144682d28dbff140e1c2deb2f44c21b"
+
+        - type: "patch"
+          path: "mesa-glvnd-fix-gl-dot-pc.patch"
+
+        - type: "patch"
+          path: "mesa-17.2.2-dri-path.patch"
+
+        - type: "patch"
+          path: "mesa-use-build-id.patch"
+
+        - type: "shell"
+          commands:
+             - autoreconf -i --force
+
+   - name: metainfo
+     buildsystem: simple
+     build-commands:
+        - mkdir -p /usr/share/appdata
+        - install online.winehub.Platform.appdata.xml /usr/share/appdata
+        - install online.winehub.Sdk.appdata.xml /usr/share/appdata
+        - appstream-compose --basename=online.winehub.Platform --prefix=/usr --origin=flatpak online.winehub.Platform
+        - appstream-compose --basename=online.winehub.Sdk --prefix=/usr --origin=flatpak online.winehub.Sdk
+     sources:
+        - type: file
+          path: online.winehub.Sdk.appdata.xml
+        - type: file
+          path: online.winehub.Platform.appdata.xml
 
 
