@@ -19,6 +19,12 @@ flatpak install -y flathub org.freedesktop.Sdk/i386/$WINEHUB_VERSION \
 	org.freedesktop.Platform/i386/$WINEHUB_VERSION \
 	org.freedesktop.Platform/x86_64/$WINEHUB_VERSION
 
+########################################################################################
+# fix: Requested extension org.freedesktop.Platform.Locale is only partially installed #
+########################################################################################
+flatpak update --user --subpath= org.freedesktop.Platform.Locale/x86_64/1.6
+flatpak update --user --subpath= org.freedesktop.Platform.Locale/i386/1.6
+
 ###################################
 # create local repository         #
 ###################################

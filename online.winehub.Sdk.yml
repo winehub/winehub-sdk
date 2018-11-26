@@ -40,6 +40,9 @@ add-extensions:
     autodelete: true
     no-autodownload: true
 
+platform-extensions:
+  - org.freedesktop.Platform.Locale
+
 inherit-extensions:
   - org.freedesktop.Platform.GL
   - org.freedesktop.Platform.Timezones
