@@ -86,7 +86,6 @@ modules:
       - x86_64
 
    - name: llvm
-
      buildsystem: "cmake-ninja"
      builddir: true
      cleanup-platform:
@@ -119,6 +118,7 @@ modules:
          - -DLLVM_BUILD_EXTERNAL_COMPILER_RT:BOOL=ON
          - -DFFI_INCLUDE_DIR=/usr/lib/libffi-3.2.1/include
          - -DLLVM_INSTALL_TOOLCHAIN_ONLY:BOOL=OFF
+
      sources:
         - type: "archiv"
           url: "http://llvm.org/releases/4.0.1/llvm-4.0.1.src.tar.xz"
