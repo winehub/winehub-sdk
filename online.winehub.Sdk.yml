@@ -18,8 +18,16 @@ add-extensions:
       autodelete: false
       no-autodownload: false
 
-   online.winehub.Platform.Wine:
-      directory: lib/wine
+   online.winehub.Platform.Wine32:
+      directory: lib/wine32
+      version: 1.6
+      versions: 1.6
+      add-ld-path: lib
+      subdirectories: false
+      autodelete: false
+
+    online.winehub.Platform.Wine64:
+      directory: lib/wine64
       version: 1.6
       versions: 1.6
       add-ld-path: lib
@@ -67,13 +75,21 @@ cleanup-commands:
 cleanup-platform-commands:
    - /usr/libexec/freedesktop-post.sh
 
+build-options:
+  cflags: -O2 -g -fstack-protector-strong -D_FORTIFY_SOURCE=2
+  cxxflags: -O2 -g -fstack-protector-strong -D_FORTIFY_SOURCE=2
+  ldflags: -fstack-protector-strong -Wl,-z,relro,-z,now
+  env:
+    V: '1'
+
 modules:
    - name: platform-setup
      buildsystem: simple
      build-commands:
        - mkdir -p /usr/lib/extension
        - mkdir -p /usr/lib/sdk
-       - mkdir -p /usr/lib/wine
+       - mkdir -p /usr/lib/wine32
+       - mkdir -p /usr/lib/wine64
 
    - name: platform-setup-compat32
      buildsystem: simple
@@ -81,105 +97,42 @@ modules:
         - mkdir -p /usr/lib/32bit
         - mkdir -p /usr/lib/32bit/extension
         - mkdir -p /usr/lib/32bit/sdk
-        - mkdir -p /usr/lib/32bit/wine
      only-arches: 
       - x86_64
 
-   - name: llvm
+   - name: llvm6
      buildsystem: "cmake-ninja"
      builddir: true
-     cleanup-platform:
-        - "/bin/llvm-*"
+     cleanup: "/lib/llvm6"
      build-options:
-       config-opts:
-         - -DLLVM_TARGETS_TO_BUILD=X86;AMDGPU;NVPTX;BPF
-         - -DBUILD_SHARED_LIBS:BOOL=ON
-         - -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON
-         - -DCMAKE_BUILD_TYPE=MinSizeRel
-         - -DLLVM_LIBDIR_SUFFIX=
-         - -DLLVM_ENABLE_LIBCXX:BOOL=OFF
-         - -DLLVM_ENABLE_ZLIB:BOOL=ON
-         - -DLLVM_ENABLE_FFI:BOOL=ON
-         - -DLLVM_ENABLE_RTTI:BOOL=ON
-         - -DLLVM_BUILD_RUNTIME:BOOL=ON
-         - -DLLVM_INCLUDE_TOOLS:BOOL=ON
-         - -DLLVM_BUILD_TOOLS:BOOL=ON
-         - -DLLVM_INCLUDE_TESTS:BOOL=OFF
-         - -DLLVM_BUILD_TESTS:BOOL=OFF
-         - -DLLVM_INCLUDE_EXAMPLES:BOOL=OFF
-         - -DLLVM_BUILD_EXAMPLES:BOOL=OFF
-         - -DLLVM_INCLUDE_UTILS:BOOL=ON
-         - -DLLVM_INSTALL_UTILS:BOOL=OFF
-         - -DLLVM_INCLUDE_DOCS:BOOL=OFF
-         - -DLLVM_BUILD_DOCS:BOOL=OFF
-         - -DLLVM_ENABLE_SPHINX:BOOL=OFF
-         - -DLLVM_ENABLE_DOXYGEN:BOOL=OFF
-         - -DLLVM_BUILD_LLVM_DYLIB:BOOL=OFF
-         - -DLLVM_BUILD_EXTERNAL_COMPILER_RT:BOOL=ON
-         - -DFFI_INCLUDE_DIR=/usr/lib/libffi-3.2.1/include
-         - -DLLVM_INSTALL_TOOLCHAIN_ONLY:BOOL=OFF
+        env:
+           cflags: ""
+           cxxflags: ""
+           ldflags: ""
+        prefix: "/usr/lib/llvm6"
+     config-opts:
+        - -DLLVM_TARGETS_TO_BUILD=X86;AMDGPU;NVPTX
+        - -DLLVM_ENABLE_ASSERTIONS:BOOL=OFF
+        - -DBUILD_SHARED_LIBS:BOOL=OFF
+        - -DCMAKE_BUILD_TYPE=Release
+        - -DLLVM_LIBDIR_SUFFIX=
+        - -DLLVM_ENABLE_LIBCXX:BOOL=OFF
+        - -DLLVM_ENABLE_ZLIB:BOOL=ON
+        - -DLLVM_ENABLE_FFI:BOOL=ON
+        - -DLLVM_INCLUDE_TESTS:BOOL=OFF
+        - -DLLVM_BUILD_TOOLS:BOOL=ON
+        - -DLLVM_INCLUDE_EXAMPLES:BOOL=OFF
+        - -DLLVM_INCLUDE_UTILS:BOOL=OFF
+        - -DLLVM_INCLUDE_DOCS:BOOL=OFF
+        - -DLLVM_ENABLE_DOXYGEN:BOOL=OFF
+        - -DLLVM_BUILD_EXTERNAL_COMPILER_RT:BOOL=ON
+        - -DFFI_INCLUDE_DIR=/usr/lib/libffi-3.2.1/include
+        - -DLLVM_INSTALL_TOOLCHAIN_ONLY:BOOL=OFF
 
      sources:
-        - type: "archiv"
-          url: "http://llvm.org/releases/4.0.1/llvm-4.0.1.src.tar.xz"
-          sha256: "da783db1f82d516791179fe103c71706046561f7972b18f0049242dee6712b51"
-
-   - name: mesa
-     build-options:
-        cxxflags: "-fno-rtti -fno-exceptions"
-        config-opts:
-           - --with-gallium-drivers=svga,swrast,radeonsi,nouveau,r600,r300,radeonsi,virgl
-           - --with-dri-drivers=swrast,nouveau,radeon,r200,i915,i965
-           - --with-vulkan-drivers=intel,radeon
-           - --enable-libglvnd
-           - --disable-selinux
-           - --disable-osmesa
-           - --with-dri-driverdir=/usr/lib/dri
-           - --enable-egl
-           - --disable-gles1
-           - --enable-gles2
-           - --enable-vdpau
-           - --enable-va
-           - --enable-xa
-           - --disable-xvmc
-           - --with-platforms=x11,drm,surfaceless,wayland
-           - --enable-shared-glapi
-           - --enable-gbm
-           - --disable-opencl
-           - --enable-glx-tls
-           - --enable-texture-float=yes
-           - --enable-dri
-           - --enable-llvm
-           - --with-llvm-prefix=/usr/lib/llvm6
-           - --disable-llvm-shared-lib
-
-     make-args:
-        - MKDEP=/bin/true
-
-     post-install:
-        - for i in /usr/lib/vdpau/*.so.1.0.0 /usr/lib/dri/*.so; do cp $i $i.tmp; eu-strip $i.tmp; mv $i.tmp $i; done
-        - ln -s libEGL_mesa.so /usr/lib/libEGL_indirect.so
-        - ln -s libEGL_mesa.so.0 /usr/lib/libEGL_indirect.so.0
-        - ln -s libGLX_mesa.so /usr/lib/libGLX_indirect.so
-        - ln -s libGLX_mesa.so.0 /usr/lib/libGLX_indirect.so.0
-
-     sources:
-        - type: "archiv"
-          url: "https://mesa.freedesktop.org/archive/mesa-18.1.8.tar.xz"
-          sha256: "bd1be67fe9c73b517765264ac28911c84144682d28dbff140e1c2deb2f44c21b"
-
-        - type: "patch"
-          path: "mesa-glvnd-fix-gl-dot-pc.patch"
-
-        - type: "patch"
-          path: "mesa-17.2.2-dri-path.patch"
-
-        - type: "patch"
-          path: "mesa-use-build-id.patch"
-
-        - type: "shell"
-          commands:
-             - autoreconf -i --force
+        - type: "archive"
+          url: "http://llvm.org/releases/6.0.0/llvm-6.0.0.src.tar.xz"
+          sha256: "1ff53c915b4e761ef400b803f07261ade637b0c269d99569f18040f3dcee4408"
 
    - name: metainfo
      buildsystem: simple
