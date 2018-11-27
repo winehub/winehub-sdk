@@ -162,6 +162,7 @@ modules:
         - --enable-glx-tls
         - --enable-texture-float=yes
         - --enable-dri
+        - --enable-nine
         - --enable-llvm
         - --with-llvm-prefix=/usr/lib/llvm7
         - --disable-llvm-shared-lib
