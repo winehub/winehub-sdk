@@ -143,7 +143,6 @@ modules:
         - --with-gallium-drivers=svga,swrast,radeonsi,nouveau,r600,r300,radeonsi,virgl
         - --with-dri-drivers=swrast,nouveau,radeon,r200,i915,i965
         - --with-vulkan-drivers=intel,radeon
-        - --with-radeonsi-llvm-compiler
         - --enable-libglvnd
         - --disable-selinux
         - --disable-osmesa
