@@ -26,7 +26,7 @@ add-extensions:
       subdirectories: false
       autodelete: false
 
-    online.winehub.Platform.Wine64:
+   online.winehub.Platform.Wine64:
       directory: lib/wine64
       version: 1.6
       versions: 1.6
@@ -103,7 +103,8 @@ modules:
    - name: llvm6
      buildsystem: "cmake-ninja"
      builddir: true
-     cleanup: "/lib/llvm6"
+     cleanup: 
+        - /usr/lib/llvm6
      build-options:
         env:
            cflags: ""
@@ -133,6 +134,59 @@ modules:
         - type: "archive"
           url: "http://llvm.org/releases/6.0.0/llvm-6.0.0.src.tar.xz"
           sha256: "1ff53c915b4e761ef400b803f07261ade637b0c269d99569f18040f3dcee4408"
+
+   - name: mesa
+     build-options:
+        cxxflags: "-fno-rtti -fno-exceptions"
+     config-opts:
+        - --with-gallium-drivers=svga,swrast,radeonsi,nouveau,r600,r300,radeonsi,virgl
+        - --with-gallium-drivers=svga,swrast,radeonsi,nouveau,r600,r300,radeonsi,virgl
+        - --with-dri-drivers=swrast,nouveau,radeon,r200,i915,i965
+        - --with-vulkan-drivers=intel,radeon
+        - --enable-libglvnd
+        - --disable-selinux
+        - --disable-osmesa
+        - --with-dri-driverdir=/usr/lib/dri
+        - --enable-egl
+        - --disable-gles1
+        - --enable-gles2
+        - --enable-vdpau
+        - --enable-va
+        - --enable-xa
+        - --disable-xvmc
+        - --with-platforms=x11,drm,surfaceless,wayland
+        - --enable-shared-glapi
+        - --enable-gbm
+        - --disable-opencl
+        - --enable-glx-tls
+        - --enable-texture-float=yes
+        - --enable-dri
+        - --enable-llvm
+        - --with-llvm-prefix=/usr/lib/llvm6
+        - --disable-llvm-shared-lib
+
+     make-args:
+        - MKDEP=/bin/true
+
+     post-install:
+        - for i in /usr/lib/vdpau/*.so.1.0.0 /usr/lib/dri/*.so; do cp $i $i.tmp; eu-strip $i.tmp; mv $i.tmp $i; done
+        - ln -s libEGL_mesa.so /usr/lib/libEGL_indirect.so
+        - ln -s libEGL_mesa.so.0 /usr/lib/libEGL_indirect.so.0
+        - ln -s libGLX_mesa.so /usr/lib/libGLX_indirect.so
+        - ln -s libGLX_mesa.so.0 /usr/lib/libGLX_indirect.so.0
+     sources:
+        - type: "archive"
+          url: "https://mesa.freedesktop.org/archive/mesa-18.1.8.tar.xz"
+          sha256: "bd1be67fe9c73b517765264ac28911c84144682d28dbff140e1c2deb2f44c21b"
+        - type: "patch"
+          path: "mesa-glvnd-fix-gl-dot-pc.patch"
+        - type: "patch"
+          path: "mesa-17.2.2-dri-path.patch"
+        - type: "patch"
+          path: "mesa-use-build-id.patch"
+        - type: "shell"
+          commands:
+            - "autoreconf -i --force"
 
    - name: metainfo
      buildsystem: simple
